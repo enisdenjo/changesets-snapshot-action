@@ -72,6 +72,7 @@ import * as github from "@actions/github";
   let prepareScript = core.getInput("prepareScript");
 
   if (prepareScript) {
+    console.log(`Running user prepare script...`);
     let [publishCommand, ...publishArgs] = prepareScript.split(/\s+/);
 
     let userPrepareScriptOutput = await execWithOutput(
@@ -81,15 +82,8 @@ import * as github from "@actions/github";
     );
 
     if (userPrepareScriptOutput.code !== 0) {
-      console.log(
-        userPrepareScriptOutput.code,
-        userPrepareScriptOutput.stderr,
-        userPrepareScriptOutput.stdout
-      );
       throw new Error("Failed to run 'prepareScript' command");
     }
-
-    console.log(userPrepareScriptOutput.stdout);
   }
 
   const result = await runPublish({

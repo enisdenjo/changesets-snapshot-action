@@ -43,17 +43,10 @@ export async function runVersion({
   );
 
   if (changesetVersionOutput.code !== 0) {
-    console.log(
-      changesetVersionOutput.code,
-      changesetVersionOutput.stderr,
-      changesetVersionOutput.stdout
-    );
     throw new Error(
       "Changeset command exited with non-zero code. Please check the output and fix the issue."
     );
   }
-
-  console.log(changesetVersionOutput.stdout);
 }
 
 export async function runPublish({
@@ -78,17 +71,10 @@ export async function runPublish({
   );
 
   if (changesetPublishOutput.code !== 0) {
-    console.log(
-      changesetPublishOutput.code,
-      changesetPublishOutput.stderr,
-      changesetPublishOutput.stdout
-    );
     throw new Error(
       "Changeset command exited with non-zero code. Please check the output and fix the issue."
     );
   }
-
-  console.log(changesetPublishOutput.stdout);
 
   let releasedPackages: PublishedPackage[] = [];
 

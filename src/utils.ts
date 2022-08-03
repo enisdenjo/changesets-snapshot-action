@@ -35,7 +35,7 @@ export function extractPublishedPackages(
   let match = line.match(newTagRegex);
 
   if (match === null) {
-    let npmOutRegex = /\+?\s+(@[^/]+\/[^@]+|[^/]+)@([^\s]+)/;
+    let npmOutRegex = /Publishing "(.*?)" at "(.*?)"/;
     match = line.match(npmOutRegex);
   }
 

@@ -33512,7 +33512,7 @@ function extractPublishedPackages(line) {
   let newTagRegex = /New tag:\s+(@[^/]+\/[^@]+|[^/]+)@([^\s]+)/;
   let match = line.match(newTagRegex);
   if (match === null) {
-    let npmOutRegex = /\+?\s+(@[^/]+\/[^@]+|[^/]+)@([^\s]+)/;
+    let npmOutRegex = /Publishing "(.*?)" at "(.*?)"/;
     match = line.match(npmOutRegex);
   }
   if (match) {
@@ -33595,16 +33595,10 @@ async function runVersion({
     }
   );
   if (changesetVersionOutput.code !== 0) {
-    console.log(
-      changesetVersionOutput.code,
-      changesetVersionOutput.stderr,
-      changesetVersionOutput.stdout
-    );
     throw new Error(
       "Changeset command exited with non-zero code. Please check the output and fix the issue."
     );
   }
-  console.log(changesetVersionOutput.stdout);
 }
 async function runPublish({
   tagName,
@@ -33626,16 +33620,10 @@ async function runPublish({
     }
   );
   if (changesetPublishOutput.code !== 0) {
-    console.log(
-      changesetPublishOutput.code,
-      changesetPublishOutput.stderr,
-      changesetPublishOutput.stdout
-    );
     throw new Error(
       "Changeset command exited with non-zero code. Please check the output and fix the issue."
     );
   }
-  console.log(changesetPublishOutput.stdout);
   let releasedPackages = [];
   for (let line of changesetPublishOutput.stdout.split("\n")) {
     let match = extractPublishedPackages(line);
@@ -34032,6 +34020,7 @@ password ${githubToken}`
   });
   let prepareScript = core.getInput("prepareScript");
   if (prepareScript) {
+    console.log(`Running user prepare script...`);
     let [publishCommand, ...publishArgs] = prepareScript.split(/\s+/);
     let userPrepareScriptOutput = await execWithOutput(
       publishCommand,
@@ -34039,14 +34028,8 @@ password ${githubToken}`
       { cwd: inputCwd }
     );
     if (userPrepareScriptOutput.code !== 0) {
-      console.log(
-        userPrepareScriptOutput.code,
-        userPrepareScriptOutput.stderr,
-        userPrepareScriptOutput.stdout
-      );
       throw new Error("Failed to run 'prepareScript' command");
     }
-    console.log(userPrepareScriptOutput.stdout);
   }
   const result = await runPublish({
     tagName,
