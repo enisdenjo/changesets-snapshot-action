@@ -34056,10 +34056,7 @@ ${commentBody}`;
 login github-actions[bot]
 password ${githubToken}`
   );
-  let { changesets } = await readChangesetState(
-    inputCwd,
-    core.getInput("baseRef")
-  );
+  let { changesets } = await readChangesetState(inputCwd);
   let hasChangesets = changesets.length !== 0;
   core.setOutput("published", "false");
   core.setOutput("publishedPackages", "[]");

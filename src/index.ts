@@ -43,10 +43,7 @@ import { upsertComment } from "./github";
     `machine github.com\nlogin github-actions[bot]\npassword ${githubToken}`
   );
 
-  let { changesets } = await readChangesetState(
-    inputCwd,
-    core.getInput("baseRef")
-  );
+  let { changesets } = await readChangesetState(inputCwd);
   let hasChangesets = changesets.length !== 0;
 
   core.setOutput("published", "false");
