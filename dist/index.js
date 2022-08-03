@@ -33612,7 +33612,7 @@ async function runPublish({
       (0, import_resolve_from2.default)(cwd, "@changesets/cli/bin.js"),
       "publish",
       "--no-git-tag",
-      "--snapshot",
+      "--tag",
       tagName
     ],
     {
@@ -33968,12 +33968,14 @@ async function readChangesetState(cwd = process.cwd()) {
 
 // src/github.ts
 var github = __toESM(require_github());
-var SNAPSHOT_COMMENT_IDENTIFIER = `<!-- prCommentKey -->`;
+var SNAPSHOT_COMMENT_IDENTIFIER = `<!-- changesetsSnapshotPrCommentKey -->`;
 function formatTable(packages) {
-  const header = `| Package | Version |
-|------|---------|`;
+  const header = `| Package | Version | Info |
+|------|---------|----|`;
   return `${header}
-${packages.map((t) => `| ${t.name} | ${t.version} |`).join("\n")}`;
+${packages.map(
+    (t) => `| \`${t.name}\` | \`${t.version}\` | [npm \u2197\uFE0E](https://www.npmjs.com/package/${t.name}/v/${t.version}) |`
+  ).join("\n")}`;
 }
 async function upsertComment(options) {
   const octokit = github.getOctokit(options.token);
@@ -33983,7 +33985,9 @@ async function upsertComment(options) {
       `Failed to locate a PR associated with the Action context, skipping Snapshot info comment...`
     );
   }
-  let commentBody = options.publishResult.published === true ? `The latest changes of this PR are available as \`${options.tagName}\` on npm (based on the declared \`changesets\`):
+  let commentBody = options.publishResult.published === true ? `### \u{1F680} Snapshot Release (\`${options.tagName}\`)
+
+The latest changes of this PR are available as \`${options.tagName}\` on npm (based on the declared \`changesets\`):
 ${formatTable(
     options.publishResult.publishedPackages
   )}` : `The latest changes of this PR are not available as \`${options.tagName}\`, since there are no linked \`changesets\` for this PR.`;
@@ -34010,7 +34014,7 @@ ${commentBody}`;
       body: commentBody,
       comment_id: existingComment.id
     });
-    console.log(`GitHub API response:`, response);
+    console.log(`GitHub API response:`, response.status, response.data);
   } else {
     console.info(`Did not found an existing comment, creating comment..`);
     const response = await octokit.rest.issues.createComment({
@@ -34018,7 +34022,7 @@ ${commentBody}`;
       body: commentBody,
       issue_number: issueContext.number
     });
-    console.log(`GitHub API response:`, response);
+    console.log(`GitHub API response:`, response.status, response.data);
   }
 }
 

@@ -62,7 +62,7 @@ export async function runPublish({
       resolveFrom(cwd, "@changesets/cli/bin.js"),
       "publish",
       "--no-git-tag",
-      "--snapshot",
+      "--tag",
       tagName,
     ],
     {
