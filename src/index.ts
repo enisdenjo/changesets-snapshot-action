@@ -45,7 +45,7 @@ import { upsertComment } from "./github";
 
   let { changesets } = await readChangesetState(
     inputCwd,
-    github.context.payload.pull_request?.head.ref
+    core.getInput("baseRef")
   );
   let hasChangesets = changesets.length !== 0;
 

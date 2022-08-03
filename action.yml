@@ -17,6 +17,10 @@ inputs:
     description: Sets up the git user for commits as `"github-actions[bot]"`. Default to `true`
     required: false
     default: 'true'
+  baseRef:
+    description: Target branch for the PR
+    required: false
+    default: ${{ github.base_ref }}
 outputs:
   published:
     description: A boolean value to indicate whether a publishing is happened or not
