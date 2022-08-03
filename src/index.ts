@@ -1,8 +1,9 @@
 import * as core from "@actions/core";
 import fs from "fs-extra";
-import * as gitUtils from "./gitUtils";
 import { runPublish } from "./run";
 import readChangesetState from "./readChangesetState";
+import { configureNpmRc, setupGitUser } from "./utils";
+import * as github from "@actions/github";
 
 (async () => {
   let githubToken = process.env.GITHUB_TOKEN;
@@ -12,6 +13,8 @@ import readChangesetState from "./readChangesetState";
     core.setFailed("Please add the GITHUB_TOKEN to the changesets action");
     return;
   }
+
+  let octokit = github.getOctokit(githubToken);
 
   if (!npmToken) {
     core.setFailed("Please add the NPM_TOKEN to the changesets action");
@@ -24,12 +27,14 @@ import readChangesetState from "./readChangesetState";
     process.chdir(inputCwd);
   }
 
-  let setupGitUser = core.getBooleanInput("setupGitUser");
+  let shouldeSetupGitUser = core.getBooleanInput("setupGitUser");
 
-  if (setupGitUser) {
+  if (shouldeSetupGitUser) {
     console.log("setting git user");
-    await gitUtils.setupUser();
+    await setupGitUser();
   }
+
+  await configureNpmRc(npmToken);
 
   console.log("setting GitHub credentials");
   await fs.writeFile(
@@ -59,45 +64,16 @@ import readChangesetState from "./readChangesetState";
     return;
   }
 
-  let userNpmrcPath = `${process.env.HOME}/.npmrc`;
-
-  if (fs.existsSync(userNpmrcPath)) {
-    console.log("Found existing user .npmrc file");
-    const userNpmrcContent = await fs.readFile(userNpmrcPath, "utf8");
-    const authLine = userNpmrcContent.split("\n").find((line) => {
-      // check based on https://github.com/npm/cli/blob/8f8f71e4dd5ee66b3b17888faad5a7bf6c657eed/test/lib/adduser.js#L103-L105
-      return /^\s*\/\/registry\.npmjs\.org\/:[_-]authToken=/i.test(line);
-    });
-    if (authLine) {
-      console.log(
-        "Found existing auth token for the npm registry in the user .npmrc file"
-      );
-    } else {
-      console.log(
-        "Didn't find existing auth token for the npm registry in the user .npmrc file, creating one"
-      );
-      fs.appendFileSync(
-        userNpmrcPath,
-        `\n//registry.npmjs.org/:_authToken=${npmToken}\n`
-      );
-    }
-  } else {
-    console.log("No user .npmrc file found, creating one");
-    fs.writeFileSync(
-      userNpmrcPath,
-      `//registry.npmjs.org/:_authToken=${npmToken}\n`
-    );
-  }
-
   console.log(
     "No changesets found, attempting to publish any unpublished packages to npm"
   );
 
   const result = await runPublish({
     tagName,
-    githubToken,
     cwd: inputCwd,
   });
+
+  console.log("Publish result:", JSON.stringify(result));
 
   if (result.published) {
     core.setOutput("published", "true");

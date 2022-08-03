@@ -1,4 +1,3 @@
-import * as github from "@actions/github";
 import {
   execWithOutput,
   extractPublishedPackages,
@@ -8,7 +7,6 @@ import resolveFrom from "resolve-from";
 
 type PublishOptions = {
   tagName: string;
-  githubToken: string;
   cwd?: string;
 };
 
@@ -25,11 +23,39 @@ type PublishResult =
 
 export async function runPublish({
   tagName,
-  githubToken,
   cwd = process.cwd(),
 }: PublishOptions): Promise<PublishResult> {
-  let octokit = github.getOctokit(githubToken);
   requireChangesetsCliPkgJson(cwd);
+
+  let changesetVersionOutput = await execWithOutput(
+    "node",
+    [
+      resolveFrom(cwd, "@changesets/cli/bin.js"),
+      "version",
+      "--snapshot",
+      tagName,
+    ],
+    {
+      cwd,
+    }
+  );
+
+  console.log(
+    changesetVersionOutput.code,
+    changesetVersionOutput.stderr,
+    changesetVersionOutput.stdout
+  );
+
+  if (changesetVersionOutput.code !== 0) {
+    console.log(
+      changesetVersionOutput.code,
+      changesetVersionOutput.stderr,
+      changesetVersionOutput.stdout
+    );
+    throw new Error(
+      "Changeset command exited with non-zero code. Please check the output and fix the issue."
+    );
+  }
 
   let changesetPublishOutput = await execWithOutput(
     "node",
@@ -45,7 +71,18 @@ export async function runPublish({
     }
   );
 
+  console.log(
+    changesetPublishOutput.code,
+    changesetPublishOutput.stderr,
+    changesetPublishOutput.stdout
+  );
+
   if (changesetPublishOutput.code !== 0) {
+    console.log(
+      changesetPublishOutput.code,
+      changesetPublishOutput.stderr,
+      changesetPublishOutput.stdout
+    );
     throw new Error(
       "Changeset command exited with non-zero code. Please check the output and fix the issue."
     );
