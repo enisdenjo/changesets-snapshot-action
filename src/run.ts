@@ -10,9 +10,9 @@ type PublishOptions = {
   cwd?: string;
 };
 
-type PublishedPackage = { name: string; version: string };
+export type PublishedPackage = { name: string; version: string };
 
-type PublishResult =
+export type PublishResult =
   | {
       published: true;
       publishedPackages: PublishedPackage[];

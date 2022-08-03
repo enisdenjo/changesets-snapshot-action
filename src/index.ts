@@ -4,6 +4,7 @@ import { runPublish, runVersion } from "./run";
 import readChangesetState from "./readChangesetState";
 import { configureNpmRc, execWithOutput, setupGitUser } from "./utils";
 import * as github from "@actions/github";
+import { upsertComment } from "./github";
 
 (async () => {
   let githubToken = process.env.GITHUB_TOKEN;
@@ -13,15 +14,13 @@ import * as github from "@actions/github";
     core.setFailed("Please add the GITHUB_TOKEN to the changesets action");
     return;
   }
-
-  let octokit = github.getOctokit(githubToken);
-
   if (!npmToken) {
     core.setFailed("Please add the NPM_TOKEN to the changesets action");
     return;
   }
 
-  const inputCwd = core.getInput("cwd");
+  const inputCwd = core.getInput("cwd") || undefined;
+
   if (inputCwd) {
     console.log("changing directory to the one given as the input");
     process.chdir(inputCwd);
@@ -99,6 +98,17 @@ import * as github from "@actions/github";
       "publishedPackages",
       JSON.stringify(result.publishedPackages)
     );
+  }
+
+  try {
+    await upsertComment({
+      token: githubToken,
+      publishResult: result,
+      tagName,
+    });
+  } catch (e) {
+    core.info(`Failed to create/update github comment.`);
+    core.warning(e as Error);
   }
 })().catch((err) => {
   console.error(err);

@@ -769,12 +769,12 @@ var require_lib = __commonJS({
             throw new Error("Client has already been disposed.");
           }
           const parsedUrl = new URL(requestUrl);
-          let info = this._prepareRequest(verb, parsedUrl, headers);
+          let info2 = this._prepareRequest(verb, parsedUrl, headers);
           const maxTries = this._allowRetries && RetryableHttpVerbs.includes(verb) ? this._maxRetries + 1 : 1;
           let numTries = 0;
           let response;
           do {
-            response = yield this.requestRaw(info, data);
+            response = yield this.requestRaw(info2, data);
             if (response && response.message && response.message.statusCode === HttpCodes.Unauthorized) {
               let authenticationHandler;
               for (const handler of this.handlers) {
@@ -784,7 +784,7 @@ var require_lib = __commonJS({
                 }
               }
               if (authenticationHandler) {
-                return authenticationHandler.handleAuthentication(this, info, data);
+                return authenticationHandler.handleAuthentication(this, info2, data);
               } else {
                 return response;
               }
@@ -807,8 +807,8 @@ var require_lib = __commonJS({
                   }
                 }
               }
-              info = this._prepareRequest(verb, parsedRedirectUrl, headers);
-              response = yield this.requestRaw(info, data);
+              info2 = this._prepareRequest(verb, parsedRedirectUrl, headers);
+              response = yield this.requestRaw(info2, data);
               redirectsRemaining--;
             }
             if (!response.message.statusCode || !HttpResponseRetryCodes.includes(response.message.statusCode)) {
@@ -829,7 +829,7 @@ var require_lib = __commonJS({
         }
         this._disposed = true;
       }
-      requestRaw(info, data) {
+      requestRaw(info2, data) {
         return __awaiter(this, void 0, void 0, function* () {
           return new Promise((resolve, reject) => {
             function callbackForResult(err, res) {
@@ -841,16 +841,16 @@ var require_lib = __commonJS({
                 resolve(res);
               }
             }
-            this.requestRawWithCallback(info, data, callbackForResult);
+            this.requestRawWithCallback(info2, data, callbackForResult);
           });
         });
       }
-      requestRawWithCallback(info, data, onResult) {
+      requestRawWithCallback(info2, data, onResult) {
         if (typeof data === "string") {
-          if (!info.options.headers) {
-            info.options.headers = {};
+          if (!info2.options.headers) {
+            info2.options.headers = {};
           }
-          info.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
+          info2.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
         }
         let callbackCalled = false;
         function handleResult(err, res) {
@@ -859,7 +859,7 @@ var require_lib = __commonJS({
             onResult(err, res);
           }
         }
-        const req = info.httpModule.request(info.options, (msg) => {
+        const req = info2.httpModule.request(info2.options, (msg) => {
           const res = new HttpClientResponse(msg);
           handleResult(void 0, res);
         });
@@ -871,7 +871,7 @@ var require_lib = __commonJS({
           if (socket) {
             socket.end();
           }
-          handleResult(new Error(`Request timeout: ${info.options.path}`));
+          handleResult(new Error(`Request timeout: ${info2.options.path}`));
         });
         req.on("error", function(err) {
           handleResult(err);
@@ -893,27 +893,27 @@ var require_lib = __commonJS({
         return this._getAgent(parsedUrl);
       }
       _prepareRequest(method, requestUrl, headers) {
-        const info = {};
-        info.parsedUrl = requestUrl;
-        const usingSsl = info.parsedUrl.protocol === "https:";
-        info.httpModule = usingSsl ? https2 : http2;
+        const info2 = {};
+        info2.parsedUrl = requestUrl;
+        const usingSsl = info2.parsedUrl.protocol === "https:";
+        info2.httpModule = usingSsl ? https2 : http2;
         const defaultPort = usingSsl ? 443 : 80;
-        info.options = {};
-        info.options.host = info.parsedUrl.hostname;
-        info.options.port = info.parsedUrl.port ? parseInt(info.parsedUrl.port) : defaultPort;
-        info.options.path = (info.parsedUrl.pathname || "") + (info.parsedUrl.search || "");
-        info.options.method = method;
-        info.options.headers = this._mergeHeaders(headers);
+        info2.options = {};
+        info2.options.host = info2.parsedUrl.hostname;
+        info2.options.port = info2.parsedUrl.port ? parseInt(info2.parsedUrl.port) : defaultPort;
+        info2.options.path = (info2.parsedUrl.pathname || "") + (info2.parsedUrl.search || "");
+        info2.options.method = method;
+        info2.options.headers = this._mergeHeaders(headers);
         if (this.userAgent != null) {
-          info.options.headers["user-agent"] = this.userAgent;
+          info2.options.headers["user-agent"] = this.userAgent;
         }
-        info.options.agent = this._getAgent(info.parsedUrl);
+        info2.options.agent = this._getAgent(info2.parsedUrl);
         if (this.handlers) {
           for (const handler of this.handlers) {
-            handler.prepareRequest(info.options);
+            handler.prepareRequest(info2.options);
           }
         }
-        return info;
+        return info2;
       }
       _mergeHeaders(headers) {
         if (this.requestOptions && this.requestOptions.headers) {
@@ -1609,18 +1609,18 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       command_1.issueCommand("error", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
     exports.error = error;
-    function warning(message, properties = {}) {
+    function warning2(message, properties = {}) {
       command_1.issueCommand("warning", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
-    exports.warning = warning;
+    exports.warning = warning2;
     function notice(message, properties = {}) {
       command_1.issueCommand("notice", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
     exports.notice = notice;
-    function info(message) {
+    function info2(message) {
       process.stdout.write(message + os.EOL);
     }
-    exports.info = info;
+    exports.info = info2;
     function startGroup(name) {
       command_1.issue("group", name);
     }
@@ -7167,8 +7167,8 @@ var require_runtime = __commonJS({
       function wrap(innerFn, outerFn, self2, tryLocsList) {
         var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
         var generator = Object.create(protoGenerator.prototype);
-        var context = new Context(tryLocsList || []);
-        generator._invoke = makeInvokeMethod(innerFn, self2, context);
+        var context2 = new Context(tryLocsList || []);
+        generator._invoke = makeInvokeMethod(innerFn, self2, context2);
         return generator;
       }
       exports2.wrap = wrap;
@@ -7282,7 +7282,7 @@ var require_runtime = __commonJS({
           return result.done ? result.value : iter.next();
         });
       };
-      function makeInvokeMethod(innerFn, self2, context) {
+      function makeInvokeMethod(innerFn, self2, context2) {
         var state = GenStateSuspendedStart;
         return function invoke(method, arg) {
           if (state === GenStateExecuting) {
@@ -7294,93 +7294,93 @@ var require_runtime = __commonJS({
             }
             return doneResult();
           }
-          context.method = method;
-          context.arg = arg;
+          context2.method = method;
+          context2.arg = arg;
           while (true) {
-            var delegate = context.delegate;
+            var delegate = context2.delegate;
             if (delegate) {
-              var delegateResult = maybeInvokeDelegate(delegate, context);
+              var delegateResult = maybeInvokeDelegate(delegate, context2);
               if (delegateResult) {
                 if (delegateResult === ContinueSentinel)
                   continue;
                 return delegateResult;
               }
             }
-            if (context.method === "next") {
-              context.sent = context._sent = context.arg;
-            } else if (context.method === "throw") {
+            if (context2.method === "next") {
+              context2.sent = context2._sent = context2.arg;
+            } else if (context2.method === "throw") {
               if (state === GenStateSuspendedStart) {
                 state = GenStateCompleted;
-                throw context.arg;
+                throw context2.arg;
               }
-              context.dispatchException(context.arg);
-            } else if (context.method === "return") {
-              context.abrupt("return", context.arg);
+              context2.dispatchException(context2.arg);
+            } else if (context2.method === "return") {
+              context2.abrupt("return", context2.arg);
             }
             state = GenStateExecuting;
-            var record = tryCatch(innerFn, self2, context);
+            var record = tryCatch(innerFn, self2, context2);
             if (record.type === "normal") {
-              state = context.done ? GenStateCompleted : GenStateSuspendedYield;
+              state = context2.done ? GenStateCompleted : GenStateSuspendedYield;
               if (record.arg === ContinueSentinel) {
                 continue;
               }
               return {
                 value: record.arg,
-                done: context.done
+                done: context2.done
               };
             } else if (record.type === "throw") {
               state = GenStateCompleted;
-              context.method = "throw";
-              context.arg = record.arg;
+              context2.method = "throw";
+              context2.arg = record.arg;
             }
           }
         };
       }
-      function maybeInvokeDelegate(delegate, context) {
-        var method = delegate.iterator[context.method];
+      function maybeInvokeDelegate(delegate, context2) {
+        var method = delegate.iterator[context2.method];
         if (method === undefined2) {
-          context.delegate = null;
-          if (context.method === "throw") {
+          context2.delegate = null;
+          if (context2.method === "throw") {
             if (delegate.iterator["return"]) {
-              context.method = "return";
-              context.arg = undefined2;
-              maybeInvokeDelegate(delegate, context);
-              if (context.method === "throw") {
+              context2.method = "return";
+              context2.arg = undefined2;
+              maybeInvokeDelegate(delegate, context2);
+              if (context2.method === "throw") {
                 return ContinueSentinel;
               }
             }
-            context.method = "throw";
-            context.arg = new TypeError(
+            context2.method = "throw";
+            context2.arg = new TypeError(
               "The iterator does not provide a 'throw' method"
             );
           }
           return ContinueSentinel;
         }
-        var record = tryCatch(method, delegate.iterator, context.arg);
+        var record = tryCatch(method, delegate.iterator, context2.arg);
         if (record.type === "throw") {
-          context.method = "throw";
-          context.arg = record.arg;
-          context.delegate = null;
+          context2.method = "throw";
+          context2.arg = record.arg;
+          context2.delegate = null;
           return ContinueSentinel;
         }
-        var info = record.arg;
-        if (!info) {
-          context.method = "throw";
-          context.arg = new TypeError("iterator result is not an object");
-          context.delegate = null;
+        var info2 = record.arg;
+        if (!info2) {
+          context2.method = "throw";
+          context2.arg = new TypeError("iterator result is not an object");
+          context2.delegate = null;
           return ContinueSentinel;
         }
-        if (info.done) {
-          context[delegate.resultName] = info.value;
-          context.next = delegate.nextLoc;
-          if (context.method !== "return") {
-            context.method = "next";
-            context.arg = undefined2;
+        if (info2.done) {
+          context2[delegate.resultName] = info2.value;
+          context2.next = delegate.nextLoc;
+          if (context2.method !== "return") {
+            context2.method = "next";
+            context2.arg = undefined2;
           }
         } else {
-          return info;
+          return info2;
         }
-        context.delegate = null;
+        context2.delegate = null;
         return ContinueSentinel;
       }
       defineIteratorMethods(Gp);
@@ -7495,14 +7495,14 @@ var require_runtime = __commonJS({
           if (this.done) {
             throw exception;
           }
-          var context = this;
+          var context2 = this;
           function handle(loc, caught) {
             record.type = "throw";
             record.arg = exception;
-            context.next = loc;
+            context2.next = loc;
             if (caught) {
-              context.method = "next";
-              context.arg = undefined2;
+              context2.method = "next";
+              context2.arg = undefined2;
             }
             return !!caught;
           }
@@ -7631,13 +7631,13 @@ var require_asyncToGenerator = __commonJS({
   "node_modules/@manypkg/get-packages/node_modules/@babel/runtime/helpers/asyncToGenerator.js"(exports, module2) {
     function asyncGeneratorStep2(gen, resolve, reject, _next, _throw, key, arg) {
       try {
-        var info = gen[key](arg);
-        var value = info.value;
+        var info2 = gen[key](arg);
+        var value = info2.value;
       } catch (error) {
         reject(error);
         return;
       }
-      if (info.done) {
+      if (info2.done) {
         resolve(value);
       } else {
         Promise.resolve(value).then(_next, _throw);
@@ -13452,11 +13452,11 @@ var require_queue = __commonJS({
   "node_modules/fastq/queue.js"(exports, module2) {
     "use strict";
     var reusify = require_reusify();
-    function fastqueue(context, worker, concurrency) {
-      if (typeof context === "function") {
+    function fastqueue(context2, worker, concurrency) {
+      if (typeof context2 === "function") {
         concurrency = worker;
-        worker = context;
-        context = null;
+        worker = context2;
+        context2 = null;
       }
       var cache = reusify(Task);
       var queueHead = null;
@@ -13518,7 +13518,7 @@ var require_queue = __commonJS({
       }
       function push(value, done) {
         var current = cache.get();
-        current.context = context;
+        current.context = context2;
         current.release = release;
         current.value = value;
         current.callback = done || noop;
@@ -13533,12 +13533,12 @@ var require_queue = __commonJS({
           }
         } else {
           _running++;
-          worker.call(context, current.value, current.worked);
+          worker.call(context2, current.value, current.worked);
         }
       }
       function unshift(value, done) {
         var current = cache.get();
-        current.context = context;
+        current.context = context2;
         current.release = release;
         current.value = value;
         current.callback = done || noop;
@@ -13553,7 +13553,7 @@ var require_queue = __commonJS({
           }
         } else {
           _running++;
-          worker.call(context, current.value, current.worked);
+          worker.call(context2, current.value, current.worked);
         }
       }
       function release(holder) {
@@ -13568,7 +13568,7 @@ var require_queue = __commonJS({
             }
             queueHead = next.next;
             next.next = null;
-            worker.call(context, next.value, next.worked);
+            worker.call(context2, next.value, next.worked);
             if (queueTail === null) {
               self2.empty();
             }
@@ -14143,7 +14143,7 @@ var require_partial = __commonJS({
       match(filepath) {
         const parts = filepath.split("/");
         const levels = parts.length;
-        const patterns = this._storage.filter((info) => !info.complete || info.segments.length > levels);
+        const patterns = this._storage.filter((info2) => !info2.complete || info2.segments.length > levels);
         for (const pattern of patterns) {
           const section = pattern.sections[0];
           if (!pattern.complete && levels > section.length) {
@@ -19016,13 +19016,13 @@ var require_regenerator2 = __commonJS({
 // node_modules/@manypkg/find-root/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
-    var info = gen[key](arg);
-    var value = info.value;
+    var info2 = gen[key](arg);
+    var value = info2.value;
   } catch (error) {
     reject(error);
     return;
   }
-  if (info.done) {
+  if (info2.done) {
     resolve(value);
   } else {
     Promise.resolve(value).then(_next, _throw);
@@ -24189,10 +24189,10 @@ var require_which = __commonJS({
         cb = opt;
         opt = {};
       }
-      var info = getPathInfo(cmd, opt);
-      var pathEnv = info.env;
-      var pathExt = info.ext;
-      var pathExtExe = info.extExe;
+      var info2 = getPathInfo(cmd, opt);
+      var pathEnv = info2.env;
+      var pathExt = info2.ext;
+      var pathExtExe = info2.extExe;
       var found = [];
       (function F(i, l) {
         if (i === l) {
@@ -24227,10 +24227,10 @@ var require_which = __commonJS({
     }
     function whichSync(cmd, opt) {
       opt = opt || {};
-      var info = getPathInfo(cmd, opt);
-      var pathEnv = info.env;
-      var pathExt = info.ext;
-      var pathExtExe = info.extExe;
+      var info2 = getPathInfo(cmd, opt);
+      var pathEnv = info2.env;
+      var pathExt = info2.ext;
+      var pathExtExe = info2.extExe;
       var found = [];
       for (var i = 0, l = pathEnv.length; i < l; i++) {
         var pathPart = pathEnv[i];
@@ -27717,8 +27717,8 @@ function isDefined(value) {
 function isKeyOperator(operator) {
   return operator === ";" || operator === "&" || operator === "?";
 }
-function getValues(context, operator, key, modifier) {
-  var value = context[key], result = [];
+function getValues(context2, operator, key, modifier) {
+  var value = context2[key], result = [];
   if (isDefined(value) && value !== "") {
     if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
       value = value.toString();
@@ -27778,7 +27778,7 @@ function parseUrl(template) {
     expand: expand.bind(null, template)
   };
 }
-function expand(template, context) {
+function expand(template, context2) {
   var operators = ["+", "#", ".", "/", ";", "?", "&"];
   return template.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g, function(_, expression, literal) {
     if (expression) {
@@ -27790,7 +27790,7 @@ function expand(template, context) {
       }
       expression.split(/,/g).forEach(function(variable) {
         var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
-        values.push(getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
+        values.push(getValues(context2, operator, tmp[1], tmp[2] || tmp[3]));
       });
       if (operator && operator !== "+") {
         var separator = ",";
@@ -33758,12 +33758,12 @@ async function getCommitsThatAddFiles(gitPaths, cwd) {
       };
     }));
     let commitsWithMissingParents = [];
-    for (const info of commitInfos) {
-      if (info.commitSha) {
-        if (info.parentSha) {
-          map.set(info.path, info.commitSha);
+    for (const info2 of commitInfos) {
+      if (info2.commitSha) {
+        if (info2.parentSha) {
+          map.set(info2.path, info2.commitSha);
         } else {
-          commitsWithMissingParents.push(info);
+          commitsWithMissingParents.push(info2);
         }
       }
     }
@@ -33966,8 +33966,63 @@ async function readChangesetState(cwd = process.cwd()) {
   };
 }
 
-// src/index.ts
+// src/github.ts
 var github = __toESM(require_github());
+var SNAPSHOT_COMMENT_IDENTIFIER = `<!-- prCommentKey -->`;
+function formatTable(packages) {
+  const header = `| Package | Version |
+|------|---------|`;
+  return `${header}
+${packages.map((t) => `| ${t.name} | ${t.version} |`).join("\n")}`;
+}
+async function upsertComment(options) {
+  const octokit = github.getOctokit(options.token);
+  const issueContext = github.context.issue;
+  if (!(issueContext == null ? void 0 : issueContext.number)) {
+    console.log(
+      `Failed to locate a PR associated with the Action context, skipping Snapshot info comment...`
+    );
+  }
+  let commentBody = options.publishResult.published === true ? `The latest changes of this PR are available as \`${options.tagName}\` on npm (based on the declared \`changesets\`):
+${formatTable(
+    options.publishResult.publishedPackages
+  )}` : `The latest changes of this PR are not available as \`${options.tagName}\`, since there are no linked \`changesets\` for this PR.`;
+  commentBody = `${SNAPSHOT_COMMENT_IDENTIFIER}
+${commentBody}`;
+  const existingComments = await octokit.rest.issues.listComments({
+    ...github.context.repo,
+    issue_number: issueContext.number,
+    per_page: 100
+  });
+  const existingComment = existingComments.data.find(
+    (v) => {
+      var _a;
+      return (_a = v.body) == null ? void 0 : _a.startsWith(SNAPSHOT_COMMENT_IDENTIFIER);
+    }
+  );
+  if (existingComment) {
+    console.info(
+      `Found an existing comment, doing a comment update...`,
+      existingComment
+    );
+    const response = await octokit.rest.issues.updateComment({
+      ...github.context.repo,
+      body: commentBody,
+      comment_id: existingComment.id
+    });
+    console.log(`GitHub API response:`, response);
+  } else {
+    console.info(`Did not found an existing comment, creating comment..`);
+    const response = await octokit.rest.issues.createComment({
+      ...github.context.repo,
+      body: commentBody,
+      issue_number: issueContext.number
+    });
+    console.log(`GitHub API response:`, response);
+  }
+}
+
+// src/index.ts
 (async () => {
   let githubToken = process.env.GITHUB_TOKEN;
   let npmToken = process.env.NPM_TOKEN;
@@ -33975,12 +34030,11 @@ var github = __toESM(require_github());
     core.setFailed("Please add the GITHUB_TOKEN to the changesets action");
     return;
   }
-  let octokit = github.getOctokit(githubToken);
   if (!npmToken) {
     core.setFailed("Please add the NPM_TOKEN to the changesets action");
     return;
   }
-  const inputCwd = core.getInput("cwd");
+  const inputCwd = core.getInput("cwd") || void 0;
   if (inputCwd) {
     console.log("changing directory to the one given as the input");
     process.chdir(inputCwd);
@@ -34042,6 +34096,16 @@ password ${githubToken}`
       "publishedPackages",
       JSON.stringify(result.publishedPackages)
     );
+  }
+  try {
+    await upsertComment({
+      token: githubToken,
+      publishResult: result,
+      tagName
+    });
+  } catch (e) {
+    core.info(`Failed to create/update github comment.`);
+    core.warning(e);
   }
 })().catch((err) => {
   console.error(err);
