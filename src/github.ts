@@ -1,4 +1,5 @@
 import * as github from "@actions/github";
+
 import { PublishedPackage, PublishResult } from "./run";
 
 const SNAPSHOT_COMMENT_IDENTIFIER = `<!-- changesetsSnapshotPrCommentKey -->`;
@@ -9,7 +10,7 @@ function formatTable(packages: PublishedPackage[]): string {
   return `${header}\n${packages
     .map(
       (t) =>
-        `| \`${t.name}\` | \`${t.version}\` | [npm ↗︎](https://www.npmjs.com/package/${t.name}/v/${t.version}){target="_blank"} |`
+        `| \`${t.name}\` | \`${t.version}\` | [npm ↗︎](https://www.npmjs.com/package/${t.name}/v/${t.version}) |`
     )
     .join("\n")}`;
 }
@@ -63,7 +64,7 @@ export async function upsertComment(options: {
       comment_id: existingComment.id,
     });
 
-    console.log(`GitHub API response:`, response.status, response.data);
+    console.log(`GitHub API response:`, response.status);
   } else {
     console.info(`Did not found an existing comment, creating comment..`);
 
@@ -73,6 +74,6 @@ export async function upsertComment(options: {
       issue_number: issueContext.number,
     });
 
-    console.log(`GitHub API response:`, response.status, response.data);
+    console.log(`GitHub API response:`, response.status);
   }
 }

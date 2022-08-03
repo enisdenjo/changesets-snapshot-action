@@ -1,9 +1,9 @@
 import * as core from "@actions/core";
 import fs from "fs-extra";
+
 import { runPublish, runVersion } from "./run";
 import readChangesetState from "./readChangesetState";
 import { configureNpmRc, execWithOutput, setupGitUser } from "./utils";
-import * as github from "@actions/github";
 import { upsertComment } from "./github";
 
 (async () => {
@@ -14,12 +14,13 @@ import { upsertComment } from "./github";
     core.setFailed("Please add the GITHUB_TOKEN to the changesets action");
     return;
   }
+
   if (!npmToken) {
     core.setFailed("Please add the NPM_TOKEN to the changesets action");
     return;
   }
 
-  const inputCwd = core.getInput("cwd") || undefined;
+  const inputCwd = core.getInput("cwd") || process.cwd();
 
   if (inputCwd) {
     console.log("changing directory to the one given as the input");

@@ -64,6 +64,8 @@ export async function runPublish({
       "--no-git-tag",
       "--tag",
       tagName,
+      "--snapshot",
+      tagName,
     ],
     {
       cwd,

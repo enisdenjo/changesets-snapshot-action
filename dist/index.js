@@ -33613,6 +33613,8 @@ async function runPublish({
       "publish",
       "--no-git-tag",
       "--tag",
+      tagName,
+      "--snapshot",
       tagName
     ],
     {
@@ -33974,7 +33976,7 @@ function formatTable(packages) {
 |------|---------|----|`;
   return `${header}
 ${packages.map(
-    (t) => `| \`${t.name}\` | \`${t.version}\` | [npm \u2197\uFE0E](https://www.npmjs.com/package/${t.name}/v/${t.version}){target="_blank"} |`
+    (t) => `| \`${t.name}\` | \`${t.version}\` | [npm \u2197\uFE0E](https://www.npmjs.com/package/${t.name}/v/${t.version}) |`
   ).join("\n")}`;
 }
 async function upsertComment(options) {
@@ -34014,7 +34016,7 @@ ${commentBody}`;
       body: commentBody,
       comment_id: existingComment.id
     });
-    console.log(`GitHub API response:`, response.status, response.data);
+    console.log(`GitHub API response:`, response.status);
   } else {
     console.info(`Did not found an existing comment, creating comment..`);
     const response = await octokit.rest.issues.createComment({
@@ -34022,7 +34024,7 @@ ${commentBody}`;
       body: commentBody,
       issue_number: issueContext.number
     });
-    console.log(`GitHub API response:`, response.status, response.data);
+    console.log(`GitHub API response:`, response.status);
   }
 }
 
@@ -34038,7 +34040,7 @@ ${commentBody}`;
     core.setFailed("Please add the NPM_TOKEN to the changesets action");
     return;
   }
-  const inputCwd = core.getInput("cwd") || void 0;
+  const inputCwd = core.getInput("cwd") || process.cwd();
   if (inputCwd) {
     console.log("changing directory to the one given as the input");
     process.chdir(inputCwd);
