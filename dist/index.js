@@ -33974,7 +33974,7 @@ function formatTable(packages) {
 |------|---------|----|`;
   return `${header}
 ${packages.map(
-    (t) => `| \`${t.name}\` | \`${t.version}\` | [npm \u2197\uFE0E](https://www.npmjs.com/package/${t.name}/v/${t.version}) |`
+    (t) => `| \`${t.name}\` | \`${t.version}\` | [npm \u2197\uFE0E](https://www.npmjs.com/package/${t.name}/v/${t.version}){target="_blank"} |`
   ).join("\n")}`;
 }
 async function upsertComment(options) {
