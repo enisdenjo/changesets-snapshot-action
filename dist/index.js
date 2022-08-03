@@ -33581,7 +33581,7 @@ async function runVersion({
   cwd = process.cwd()
 }) {
   requireChangesetsCliPkgJson(cwd);
-  console.info(`Running version workflow...`);
+  console.info(`Running version workflow from cwd:`, cwd);
   let changesetVersionOutput = await execWithOutput(
     "node",
     [
@@ -34038,9 +34038,9 @@ ${commentBody}`;
     core.setFailed("Please add the NPM_TOKEN to the changesets action");
     return;
   }
-  const inputCwd = core.getInput("cwd") || process.cwd();
+  const inputCwd = core.getInput("cwd");
   if (inputCwd) {
-    console.log("changing directory to the one given as the input");
+    console.log("changing directory to the one given as the input: ", inputCwd);
     process.chdir(inputCwd);
   }
   let shouldeSetupGitUser = core.getBooleanInput("setupGitUser");

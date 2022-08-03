@@ -20,10 +20,10 @@ import { upsertComment } from "./github";
     return;
   }
 
-  const inputCwd = core.getInput("cwd") || process.cwd();
+  const inputCwd = core.getInput("cwd");
 
   if (inputCwd) {
-    console.log("changing directory to the one given as the input");
+    console.log("changing directory to the one given as the input: ", inputCwd);
     process.chdir(inputCwd);
   }
 

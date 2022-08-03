@@ -26,8 +26,7 @@ export async function runVersion({
   cwd = process.cwd(),
 }: PublishOptions) {
   requireChangesetsCliPkgJson(cwd);
-
-  console.info(`Running version workflow...`);
+  console.info(`Running version workflow from cwd:`, cwd);
 
   let changesetVersionOutput = await execWithOutput(
     "node",
