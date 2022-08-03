@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import fs from "fs-extra";
+import * as github from "@actions/github";
 
 import { runPublish, runVersion } from "./run";
 import readChangesetState from "./readChangesetState";
@@ -42,7 +43,10 @@ import { upsertComment } from "./github";
     `machine github.com\nlogin github-actions[bot]\npassword ${githubToken}`
   );
 
-  let { changesets } = await readChangesetState();
+  let { changesets } = await readChangesetState(
+    inputCwd,
+    github.context.payload.pull_request?.head.ref
+  );
   let hasChangesets = changesets.length !== 0;
 
   core.setOutput("published", "false");
