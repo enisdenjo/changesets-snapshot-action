@@ -33613,8 +33613,6 @@ async function runPublish({
       "publish",
       "--no-git-tag",
       "--tag",
-      tagName,
-      "--snapshot",
       tagName
     ],
     {
