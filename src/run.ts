@@ -21,11 +21,13 @@ type PublishResult =
       published: false;
     };
 
-export async function runPublish({
+export async function runVersion({
   tagName,
   cwd = process.cwd(),
-}: PublishOptions): Promise<PublishResult> {
+}: PublishOptions) {
   requireChangesetsCliPkgJson(cwd);
+
+  console.info(`Running version workflow...`);
 
   let changesetVersionOutput = await execWithOutput(
     "node",
@@ -40,12 +42,6 @@ export async function runPublish({
     }
   );
 
-  console.log(
-    changesetVersionOutput.code,
-    changesetVersionOutput.stderr,
-    changesetVersionOutput.stdout
-  );
-
   if (changesetVersionOutput.code !== 0) {
     console.log(
       changesetVersionOutput.code,
@@ -56,6 +52,16 @@ export async function runPublish({
       "Changeset command exited with non-zero code. Please check the output and fix the issue."
     );
   }
+
+  console.log(changesetVersionOutput.stdout);
+}
+
+export async function runPublish({
+  tagName,
+  cwd = process.cwd(),
+}: PublishOptions): Promise<PublishResult> {
+  requireChangesetsCliPkgJson(cwd);
+  console.info(`Running publish workflow...`);
 
   let changesetPublishOutput = await execWithOutput(
     "node",
@@ -71,12 +77,6 @@ export async function runPublish({
     }
   );
 
-  console.log(
-    changesetPublishOutput.code,
-    changesetPublishOutput.stderr,
-    changesetPublishOutput.stdout
-  );
-
   if (changesetPublishOutput.code !== 0) {
     console.log(
       changesetPublishOutput.code,
@@ -87,6 +87,8 @@ export async function runPublish({
       "Changeset command exited with non-zero code. Please check the output and fix the issue."
     );
   }
+
+  console.log(changesetPublishOutput.stdout);
 
   let releasedPackages: PublishedPackage[] = [];
 

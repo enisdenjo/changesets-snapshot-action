@@ -4,6 +4,9 @@ runs:
   using: "node16"
   main: "dist/index.js"
 inputs:
+  prepareScript:
+    description: "The command to use to build, this script runs after 'version' flow, and before 'publish' flow"
+    required: false
   tag:
     description: "The name of the tag to use for snapshot publishing"
     required: true

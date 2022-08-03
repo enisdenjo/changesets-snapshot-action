@@ -33576,11 +33576,12 @@ async function configureNpmRc(npmToken) {
 
 // src/run.ts
 var import_resolve_from2 = __toESM(require_resolve_from());
-async function runPublish({
+async function runVersion({
   tagName,
   cwd = process.cwd()
 }) {
   requireChangesetsCliPkgJson(cwd);
+  console.info(`Running version workflow...`);
   let changesetVersionOutput = await execWithOutput(
     "node",
     [
@@ -33593,11 +33594,6 @@ async function runPublish({
       cwd
     }
   );
-  console.log(
-    changesetVersionOutput.code,
-    changesetVersionOutput.stderr,
-    changesetVersionOutput.stdout
-  );
   if (changesetVersionOutput.code !== 0) {
     console.log(
       changesetVersionOutput.code,
@@ -33608,6 +33604,14 @@ async function runPublish({
       "Changeset command exited with non-zero code. Please check the output and fix the issue."
     );
   }
+  console.log(changesetVersionOutput.stdout);
+}
+async function runPublish({
+  tagName,
+  cwd = process.cwd()
+}) {
+  requireChangesetsCliPkgJson(cwd);
+  console.info(`Running publish workflow...`);
   let changesetPublishOutput = await execWithOutput(
     "node",
     [
@@ -33621,11 +33625,6 @@ async function runPublish({
       cwd
     }
   );
-  console.log(
-    changesetPublishOutput.code,
-    changesetPublishOutput.stderr,
-    changesetPublishOutput.stdout
-  );
   if (changesetPublishOutput.code !== 0) {
     console.log(
       changesetPublishOutput.code,
@@ -33636,6 +33635,7 @@ async function runPublish({
       "Changeset command exited with non-zero code. Please check the output and fix the issue."
     );
   }
+  console.log(changesetPublishOutput.stdout);
   let releasedPackages = [];
   for (let line of changesetPublishOutput.stdout.split("\n")) {
     let match = extractPublishedPackages(line);
@@ -34025,6 +34025,28 @@ password ${githubToken}`
       "Please configure the 'tag' name you wish to use for the release."
     );
     return;
+  }
+  await runVersion({
+    tagName,
+    cwd: inputCwd
+  });
+  let prepareScript = core.getInput("prepareScript");
+  if (prepareScript) {
+    let [publishCommand, ...publishArgs] = prepareScript.split(/\s+/);
+    let userPrepareScriptOutput = await execWithOutput(
+      publishCommand,
+      publishArgs,
+      { cwd: inputCwd }
+    );
+    if (userPrepareScriptOutput.code !== 0) {
+      console.log(
+        userPrepareScriptOutput.code,
+        userPrepareScriptOutput.stderr,
+        userPrepareScriptOutput.stdout
+      );
+      throw new Error("Failed to run 'prepareScript' command");
+    }
+    console.log(userPrepareScriptOutput.stdout);
   }
   const result = await runPublish({
     tagName,

@@ -1,8 +1,8 @@
 import * as core from "@actions/core";
 import fs from "fs-extra";
-import { runPublish } from "./run";
+import { runPublish, runVersion } from "./run";
 import readChangesetState from "./readChangesetState";
-import { configureNpmRc, setupGitUser } from "./utils";
+import { configureNpmRc, execWithOutput, setupGitUser } from "./utils";
 import * as github from "@actions/github";
 
 (async () => {
@@ -62,6 +62,34 @@ import * as github from "@actions/github";
     );
 
     return;
+  }
+
+  await runVersion({
+    tagName,
+    cwd: inputCwd,
+  });
+
+  let prepareScript = core.getInput("prepareScript");
+
+  if (prepareScript) {
+    let [publishCommand, ...publishArgs] = prepareScript.split(/\s+/);
+
+    let userPrepareScriptOutput = await execWithOutput(
+      publishCommand,
+      publishArgs,
+      { cwd: inputCwd }
+    );
+
+    if (userPrepareScriptOutput.code !== 0) {
+      console.log(
+        userPrepareScriptOutput.code,
+        userPrepareScriptOutput.stderr,
+        userPrepareScriptOutput.stdout
+      );
+      throw new Error("Failed to run 'prepareScript' command");
+    }
+
+    console.log(userPrepareScriptOutput.stdout);
   }
 
   const result = await runPublish({
