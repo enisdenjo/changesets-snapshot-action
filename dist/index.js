@@ -34026,9 +34026,6 @@ password ${githubToken}`
     );
     return;
   }
-  console.log(
-    "No changesets found, attempting to publish any unpublished packages to npm"
-  );
   const result = await runPublish({
     tagName,
     cwd: inputCwd
