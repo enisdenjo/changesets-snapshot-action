@@ -33974,7 +33974,7 @@ function formatTable(packages) {
 |------|---------|----|`;
   return `${header}
 ${packages.map(
-    (t) => `| \`${t.name}\` | \`${t.version}\` | [npm \u2197\uFE0E](https://www.npmjs.com/package/${t.name}/v/${t.version}) [unpkg \u2197\uFE0E](https://unpkg.com/browse/${t.name}@${t.version}/) ![npm bundle size](https://img.shields.io/bundlephobia/min/${t.name}/${t.version}?label=bundle%20size) |`
+    (t) => `| \`${t.name}\` | \`${t.version}\` | [npm \u2197\uFE0E](https://www.npmjs.com/package/${t.name}/v/${t.version}) [unpkg \u2197\uFE0E](https://unpkg.com/browse/${t.name}@${t.version}/) |`
   ).join("\n")}`;
 }
 async function upsertComment(options) {

@@ -10,7 +10,7 @@ function formatTable(packages: PublishedPackage[]): string {
   return `${header}\n${packages
     .map(
       (t) =>
-        `| \`${t.name}\` | \`${t.version}\` | [npm ↗︎](https://www.npmjs.com/package/${t.name}/v/${t.version}) [unpkg ↗︎](https://unpkg.com/browse/${t.name}@${t.version}/) ![npm bundle size](https://img.shields.io/bundlephobia/min/${t.name}/${t.version}?label=bundle%20size) |`
+        `| \`${t.name}\` | \`${t.version}\` | [npm ↗︎](https://www.npmjs.com/package/${t.name}/v/${t.version}) [unpkg ↗︎](https://unpkg.com/browse/${t.name}@${t.version}/) |`
     )
     .join("\n")}`;
 }
