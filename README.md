@@ -12,6 +12,9 @@ The following flow is being executed:
 - Runs `publish` flow with `--tag` and `--no-git-tag` (to create a "temporary" release)
 - Publishes a GitHub comment on the Pull Request, with the list of releases done.
 
+<img width="931" alt="image" src="https://user-images.githubusercontent.com/3680083/182776353-2f365f9d-c156-4c4f-8947-18cf87dc6adf.png">
+
+
 > This GitHub Action does not create GitHub Releases and does not push Git tags - it meant to be used for canary releases, and encapsulate the changes within a PR.
 
 ## Usage
