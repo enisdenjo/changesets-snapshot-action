@@ -82,9 +82,6 @@ export async function runPublish({
 
   let releasedPackages: PublishedPackage[] = [];
 
-  console.log("Changeset publish output:");
-  console.log(changesetPublishOutput.stdout);
-
   for (let line of changesetPublishOutput.stdout.split("\n")) {
     let match = extractPublishedPackages(line);
 
